@@ -1,2 +1,2 @@
 I am a test file for sanity checking.
-I really don't know what to put here
+Is the test file crazy or does it have its sanity?
