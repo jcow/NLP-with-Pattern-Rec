@@ -22,14 +22,14 @@ def get_words_from_file(fileid):
 ##
 # Helper function to get the tagged words of the brown corpus
 ##
-def get_tagged_words(fileid):
+def get_tagged_words_from_file(fileid):
     return current_corpus.tagged_words(fileids=fileid);
 
 
 ## 
 # Helper function to return a list of lists of sentences for a given file
 ##
-def get_sentences(fileid):
+def get_sentences_from_file(fileid):
     return current_corpus.sents(fileids=fileid)
 
 
@@ -62,7 +62,7 @@ def get_vocabulary_count(words):
 ##
 def get_adverbs(fileid):
     ret = []
-    for i in get_tagged_words(fileid):
+    for i in get_tagged_words_from_file(fileid):
         if i[1] == 'RB':
             ret.append(i[0])
     return ret
@@ -73,7 +73,7 @@ def get_adverbs(fileid):
 ##
 def get_prepositions(fileid):
     ret = []
-    for i in get_tagged_words(fileid):
+    for i in get_tagged_words_from_file(fileid):
         if i[1] == 'IN':
             ret.append(i[0])
     return ret
@@ -125,13 +125,131 @@ def get_therefore_count(words):
     return count
 
 ##
-# Get punctuation count for a specific puncuation character
+# Get the sentence count 
+##
+def get_sentence_count(sents):
+    return len(sents)
+
+##
+# Get the average characters per sentence count 
+##
+def get_chars_per_sentence_avg(words, sents):
+    return get_character_count(words) / get_sentence_count(sents)
+
+##
+# Tags include anything in the list ['me', 'we', 'us', 'our', 'my', 'us']
+##
+def get_first_person_pronouns(words):
+    ret = []
+    for word in words:
+        for fppn in ['me', 'we', 'us', 'our', 'my', 'us']:
+            if word.lower() == fppn:
+                ret.append(word)
+                break;
+    return len(ret)
+
+##
+# Get the 'me' count
+##
+def get_me_count(words):
+    ret = []
+    for word in words:
+        if word.lower() == 'me':
+            ret.append(word)
+    return len(ret)
+
+##
+# Get the 'present partciple' count. Tags: BEG, FW-VBG, HVG, VBG, VBG+TO
+##
+def get_present_participle_count(tagged_words):
+    ret = []
+    for (word, tag) in tagged_words:
+        for pp in ['BEG', 'FW-VBG', 'HVG', 'VBG', 'VBG+TO']:
+            if tag == pp:
+                ret.append(tag)
+                break;
+    return len(ret)
+
+##
+# Get the 'I' count
+##
+def get_I_count(words):
+    ret = []
+    for word in words:
+        if word == 'I':
+            ret.append(word)
+    return len(ret)
+
+##
+# Get the average characters per word count 
+##
+def get_chars_per_word_avg(words):
+    return get_character_count(words) / len(words)
+
+##
+# Get the 'it' count
+##
+def get_it_count(words):
+    ret = []
+    for word in words:
+        if word.lower() == 'it':
+            ret.append(word)
+    return len(ret)
+
+##
+# Get the 'noun' count. Tags: FW-AT+NN, FW-AT+NP, FW-IN+NN, FW-IN+NP, FW-NN, FW-NN$, FW-NNS, FW-NP, FW-NPS, FW-NR, NN, NN$, NN+BEZ, NN+HVD,
+##
+def get_noun_count(tagged_words):
+    ret = []
+    for (word, tag) in tagged_words:
+        if 'NN' in tag:
+            ret.append(tag)
+    return len(ret)
+
+##
+# Get the 'present verb' count.
+# Tags:  BEM, BEM*, BER, BER*, BEZ, BEZ*, DO, DO*, DO+PPSS, DOZ, DOZ*, DT+BEZ, DTS+BEZ, EX+BEZ, EX+HVZ, FW-BEZ, FW-DT+BEZ, FW-HV, FW-PPL+VBZ, FW-PPSS+HV, FW-VB, FW-VBZ, HV, HV*, HV+TO,
+#        HVZ, HVZ*, VB, VB+AT, VB+IN, VB+JJ, VB+PPO, VB+TO, VB+VB, VBZ, WDT+BER, WDT+BER+PP, WDT+BEZ, WDT+DO+PPS, WDT+DOD, WDT+HVZ, WPS+BEZ, WPS+HVZ
+##
+def get_present_verb_count(tagged_words):
+    ret = []
+    for (word, tag) in tagged_words:
+        for pp in ['BEM', 'BEM*', 'BER', 'BER*', 'BEZ', 'BEZ*', 'DO', 'DO*', 'DO+PPSS', 'DOZ', 'DOZ*', 'DT+BEZ', 'DTS+BEZ', 'EX+BEZ', 'EX+HVZ',
+                   'FW-BEZ', 'FW-DT+BEZ', 'FW-HV', 'FW-PPL+VBZ', 'FW-PPSS+HV', 'FW-VB', 'FW-VBZ', 'HV', 'HV*', 'HV+TO', 'HVZ', 'HVZ*', 'VB',
+                   'VB+AT', 'VB+IN', 'VB+JJ', 'VB+PPO', 'VB+TO', 'VB+VB', 'VBZ', 'WDT+BER', 'WDT+BER+PP', 'WDT+BEZ', 'WDT+DO+PPS', 'WDT+DOD', 'WDT+HVZ', 'WPS+BEZ', 'WPS+HVZ']:
+            if tag == pp:
+                ret.append(tag)
+                break;
+    return len(ret)
+
+##
+# Get the 'that' count
+##
+def get_that_count(words):
+    ret = []
+    for word in words:
+        if word.lower() == 'that':
+            ret.append(word)
+    return len(ret)
+
+##
+# Get the 'which' count
+##
+def get_which_count(words):
+    ret = []
+    for word in words:
+        if word.lower() == 'which':
+            ret.append(word)
+    return len(ret)
+
+##
+# Get punctuation count for a specific punctuation character
 # @param words:
 #    A list of words from the corpus
 # @param punc:
-#    The puncuation character you wish to count
+#    The punctuation character you wish to count
 ##
-def get_puncuation_count(words, punc):
+def get_punctuation_count(words, punc):
     count = 0
     for word in words:
         if word == punc:
@@ -143,12 +261,26 @@ def get_puncuation_count(words, punc):
 # TEST CRAP
 
 words = get_words_from_file('cg22')
+tagged_words = get_tagged_words_from_file('cg22')
+sents = get_sentences_from_file('cg22')
 
-print get_tagged_words('cg22')
+print get_tagged_words_from_file('cg22')
 
 print get_second_person_pronouns(brown.words(fileids='cg22'))
 
 print get_adverbs('cg22')
 
-print get_puncuation_count(['cats', 'are', 'really', 'no', 'fun', '?'], '?')
-print get_puncuation_count(words, '.')
+print "Sentence count: " + str(get_sentence_count(sents))
+print "Character count: " + str(get_chars_per_sentence_avg(words, sents))
+print "FPPN count: " + str(get_first_person_pronouns(words))
+print "'Me' count: " + str(get_me_count(words))
+print "PP count: " + str(get_present_participle_count(tagged_words))
+print "'I' count: " + str(get_I_count(words))
+print "'it' count: " + str(get_it_count(words))
+print "Noun count: " + str(get_noun_count(tagged_words))
+print "Verb count: " + str(get_present_verb_count(tagged_words))
+print "'that' count: " + str(get_that_count(words))
+print "'which' count: " + str(get_which_count(words))
+
+print get_punctuation_count(['cats', 'are', 'really', 'no', 'fun', '?'], '?')
+print get_punctuation_count(words, '.')
