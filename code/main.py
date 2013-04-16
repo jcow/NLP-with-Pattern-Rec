@@ -1,7 +1,7 @@
 from __future__ import division
 import nltk
 from nltk.corpus import brown
-
+from tags import *
 
 #-----------------------------------------------------------------------------
 #  Configurations
@@ -55,30 +55,6 @@ def get_lexical_diversity(words):
 def get_vocabulary_count(words):
     return len(set(words))
 
-
-##
-# Gets the adverbs, tag of RB
-#     Tags are defined here: http://www.comp.leeds.ac.uk/ccalas/tagsets/brown.html
-##
-def get_adverbs(fileid):
-    ret = []
-    for i in get_tagged_words_from_file(fileid):
-        if i[1] == 'RB':
-            ret.append(i[0])
-    return ret
-            
-##
-# Gets the adverbs, tag of IN
-#    Tags are defined here: http://www.comp.leeds.ac.uk/ccalas/tagsets/brown.html
-##
-def get_prepositions(fileid):
-    ret = []
-    for i in get_tagged_words_from_file(fileid):
-        if i[1] == 'IN':
-            ret.append(i[0])
-    return ret
-            
-            
 ##
 # Tags include anything in the list ['you', 'yous', 'your', 'yours']
 ##
@@ -95,7 +71,7 @@ def get_second_person_pronouns(words):
 # Get the total character count for a set of words
 #     The idea for this dimension comes from http://arxiv.org/pdf/cmp-lg/9410008.pdf
 ##
-def get_character_count(words):
+def get_total_character_count(words):
     count = 0
     for word in words:
         count += len(word)
@@ -134,7 +110,7 @@ def get_sentence_count(sents):
 # Get the average characters per sentence count 
 ##
 def get_chars_per_sentence_avg(words, sents):
-    return get_character_count(words) / get_sentence_count(sents)
+    return get_total_character_count(words) / get_sentence_count(sents)
 
 ##
 # Tags include anything in the list ['me', 'we', 'us', 'our', 'my', 'us']
@@ -264,14 +240,9 @@ words = get_words_from_file('cg22')
 tagged_words = get_tagged_words_from_file('cg22')
 sents = get_sentences_from_file('cg22')
 
-print get_tagged_words_from_file('cg22')
-
-print get_second_person_pronouns(brown.words(fileids='cg22'))
-
-print get_adverbs('cg22')
 
 print "Sentence count: " + str(get_sentence_count(sents))
-print "Character count: " + str(get_chars_per_sentence_avg(words, sents))
+print "Char Avg Per Sentence: " + str(get_chars_per_sentence_avg(words, sents))
 print "FPPN count: " + str(get_first_person_pronouns(words))
 print "'Me' count: " + str(get_me_count(words))
 print "PP count: " + str(get_present_participle_count(tagged_words))
@@ -284,3 +255,82 @@ print "'which' count: " + str(get_which_count(words))
 
 print get_punctuation_count(['cats', 'are', 'really', 'no', 'fun', '?'], '?')
 print get_punctuation_count(words, '.')
+
+print get_tagged_words_from_file('cg22')
+
+'''
+t = Tags()
+print t.get_tag_counts(get_tagged_words_from_file('cg22'))
+'''
+
+# make the csv file
+final_dump = []
+
+final_dump_header = ["! Count", "\" Count", "$ Count", "% Count", "& Count", "' Count", "( Count", ") Count", "* Count", ", Count", ".Count", ": Count", "; Count", "? Count","'Therefore' Count","Long Characters", "Total Chars", "Second Person Pronouns","Vocabulary Count", "Lexical Diversity", "Sentence Count", "Char Avg Per Sentence", "FPPN Count", "'Me' count", "PP count","'I' count", "'it' count", "Noun count", "Verb count", "'that' count", "'which' count"]
+tag = Tags()
+for t in tag.get_tags():
+    final_dump_header.append(t)
+final_dump.append(final_dump_header)
+
+
+for fileid in current_corpus.fileids():
+    words = get_words_from_file(fileid)
+    tagged_words = get_tagged_words_from_file(fileid)
+    sents = get_sentences_from_file(fileid)
+    
+    row = []
+    row.append(str(get_punctuation_count(words, "!")))
+    row.append(str(get_punctuation_count(words, "\"")))
+    row.append(str(get_punctuation_count(words, "$")))
+    row.append(str(get_punctuation_count(words, "%")))
+    row.append(str(get_punctuation_count(words, "&")))
+    row.append(str(get_punctuation_count(words, "'")))
+    row.append(str(get_punctuation_count(words, "(")))
+    row.append(str(get_punctuation_count(words, ")")))
+    row.append(str(get_punctuation_count(words, "*")))
+    row.append(str(get_punctuation_count(words, ",")))
+    row.append(str(get_punctuation_count(words, ".")))
+    row.append(str(get_punctuation_count(words, ":")))
+    row.append(str(get_punctuation_count(words, ";")))
+    row.append(str(get_punctuation_count(words, "?")))
+    row.append(str(get_therefore_count(words)))
+    row.append(str(get_long_word_count(words)))
+    row.append(str(get_total_character_count(words)))
+    row.append(str(len(get_second_person_pronouns(words))))
+    row.append(str(get_vocabulary_count(words)))
+    row.append(str(get_lexical_diversity(words)))
+    row.append(str(get_sentence_count(sents)))
+    row.append(str(get_chars_per_sentence_avg(words, sents)))
+    row.append(str(get_first_person_pronouns(words)))
+    row.append(str(get_me_count(words)))
+    row.append(str(get_present_participle_count(tagged_words)))
+    row.append(str(get_I_count(words)))
+    row.append(str(get_it_count(words)))
+    row.append(str(get_noun_count(tagged_words)))
+    row.append(str(get_present_verb_count(tagged_words)))
+    row.append(str(get_that_count(words)))
+    row.append(str(get_which_count(words)) )
+
+    tag = Tags()
+    for t in tag.get_tag_counts(tagged_words):
+        row.append(t[1])
+    
+    final_dump.append(row)
+    
+final_string = ""
+
+last_line = len(final_dump[0])-1
+counter = 0
+for row in final_dump:
+    final_string = str(final_string+(','.join( map( str, row) )))
+    if counter != last_line:
+        final_string = str(final_string + "\n")
+
+print "-----------------"
+print final_string
+print len(final_dump[0])
+print len(final_dump[1])
+
+f = open("../results/tagged_words.csv", "r+")
+f.write(final_string)
+f.close()
