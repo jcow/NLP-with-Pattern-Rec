@@ -44,7 +44,7 @@ def get_sentences_from_file(fileid):
 # @param words: The list of words from a text
 ##
 def get_lexical_diversity(words):
-    return len(words) / len(set(words))
+    return round((len(words) / len(set(words))), 6)
 
 ##
 # Returns the number distinct tokens used in a text
@@ -110,7 +110,7 @@ def get_sentence_count(sents):
 # Get the average characters per sentence count 
 ##
 def get_chars_per_sentence_avg(words, sents):
-    return get_total_character_count(words) / get_sentence_count(sents)
+    return round((get_total_character_count(words) / get_sentence_count(sents)), 6)
 
 ##
 # Tags include anything in the list ['me', 'we', 'us', 'our', 'my', 'us']
@@ -160,7 +160,7 @@ def get_I_count(words):
 # Get the average characters per word count 
 ##
 def get_chars_per_word_avg(words):
-    return get_character_count(words) / len(words)
+    return round((get_character_count(words) / len(words)), 6)
 
 ##
 # Get the 'it' count
@@ -266,7 +266,7 @@ print t.get_tag_counts(get_tagged_words_from_file('cg22'))
 # make the csv file
 final_dump = []
 
-final_dump_header = ["! Count", "\" Count", "$ Count", "% Count", "& Count", "' Count", "( Count", ") Count", "* Count", ", Count", ".Count", ": Count", "; Count", "? Count","'Therefore' Count","Long Characters", "Total Chars", "Second Person Pronouns","Vocabulary Count", "Lexical Diversity", "Sentence Count", "Char Avg Per Sentence", "FPPN Count", "'Me' count", "PP count","'I' count", "'it' count", "Noun count", "Verb count", "'that' count", "'which' count"]
+final_dump_header = ["! Count", "Quote Count", "$ Count", "% Count", "& Count", "Apostrophe Count", "( Count", ") Count", "* Count", "Comma Count", ".Count", ": Count", "; Count", "? Count","'Therefore' Count","Long Characters", "Total Chars", "Second Person Pronouns","Vocabulary Count", "Lexical Diversity", "Sentence Count", "Char Avg Per Sentence", "FPPN Count", "'Me' count", "PP count","'I' count", "'it' count", "Noun count", "Verb count", "'that' count", "'which' count"]
 tag = Tags()
 for t in tag.get_tags():
     final_dump_header.append(t)
@@ -332,5 +332,7 @@ print len(final_dump[0])
 print len(final_dump[1])
 
 f = open("../results/tagged_words.csv", "r+")
-f.write(final_string)
+f.writelines(final_string)
 f.close()
+
+print("Done")
