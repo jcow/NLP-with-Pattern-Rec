@@ -159,8 +159,8 @@ def get_I_count(words):
 ##
 # Get the average characters per word count 
 ##
-def get_chars_per_word_avg(words):
-    return round((get_character_count(words) / len(words)), 6)
+#def get_chars_per_word_avg(words):
+    #return round((get_character_count(words) / len(words)), 6)
 
 ##
 # Get the 'it' count
@@ -236,6 +236,7 @@ def get_punctuation_count(words, punc):
 
 # TEST CRAP
 
+'''
 words = get_words_from_file('cg22')
 tagged_words = get_tagged_words_from_file('cg22')
 sents = get_sentences_from_file('cg22')
@@ -258,27 +259,31 @@ print get_punctuation_count(words, '.')
 
 print get_tagged_words_from_file('cg22')
 
-'''
+
 t = Tags()
 print t.get_tag_counts(get_tagged_words_from_file('cg22'))
 '''
 
+
 # make the csv file
 final_dump = []
 
-final_dump_header = ["! Count", "Quote Count", "$ Count", "% Count", "& Count", "Apostrophe Count", "( Count", ") Count", "* Count", "Comma Count", ".Count", ": Count", "; Count", "? Count","'Therefore' Count","Long Characters", "Total Chars", "Second Person Pronouns","Vocabulary Count", "Lexical Diversity", "Sentence Count", "Char Avg Per Sentence", "FPPN Count", "'Me' count", "PP count","'I' count", "'it' count", "Noun count", "Verb count", "'that' count", "'which' count"]
+final_dump_header = ["FileID", "Category", "Exclamation Count", "Quote Count", "Dollar Sign Count", "Percent Sign Count", "Ampersand Count", "Apostrophe Count", "Open Parenthesis Count", "Close Parenthesis Count", "Star Symbol Count", "Comma Count", "Period Count", "Colon Count", "Semicolon Count", "Question Mark Count","'Therefore' Count","Long Characters", "Total Chars", "Second Person Pronouns","Vocabulary Count", "Lexical Diversity", "Sentence Count", "Char Avg Per Sentence", "FPPN Count", "'Me' count", "PP count","'I' count", "'it' count", "Noun count", "Verb count", "'that' count", "'which' count"]
 tag = Tags()
 for t in tag.get_tags():
     final_dump_header.append(t)
 final_dump.append(final_dump_header)
 
 
+count = 1
 for fileid in current_corpus.fileids():
     words = get_words_from_file(fileid)
     tagged_words = get_tagged_words_from_file(fileid)
     sents = get_sentences_from_file(fileid)
     
     row = []
+    row.append(str(fileid))
+    row.append(str(current_corpus.categories(fileids=fileid)[0]))
     row.append(str(get_punctuation_count(words, "!")))
     row.append(str(get_punctuation_count(words, "\"")))
     row.append(str(get_punctuation_count(words, "$")))
@@ -315,7 +320,11 @@ for fileid in current_corpus.fileids():
     for t in tag.get_tag_counts(tagged_words):
         row.append(t[1])
     
+    print str(count)+" row length: "+str(len(row))
+    
     final_dump.append(row)
+    
+    count += 1
     
 final_string = ""
 
@@ -327,7 +336,7 @@ for row in final_dump:
         final_string = str(final_string + "\n")
 
 print "-----------------"
-print final_string
+#print final_string
 print len(final_dump[0])
 print len(final_dump[1])
 
