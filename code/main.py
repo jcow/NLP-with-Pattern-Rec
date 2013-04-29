@@ -7,10 +7,22 @@ from tags import *
 #  Configurations
 #-----------------------------------------------------------------------------
 
-# which corpus do we want to use
+# corpus we want to use
 current_corpus = brown
 
+# categories we want to explore
+press = ["news","editorial","reviews"]
+misc = ["religion","hobbies","lore","belles_lettres"]
+non_fiction = ["government","learned"]
+fiction = ["fiction","mystery","science_fiction","adventure","romance","humor"]
+informative = dict()
+informative["press"] = press
+informative["misc"] = misc
+informative["non_fiction"] = non_fiction
 
+imaginative = dict()
+imaginative["fiction"] = fiction
+dict()
 
 #-----------------------------------------------------------------------------
 #  Helper functions to assist the Dimension-finding fucntions
@@ -32,6 +44,19 @@ def get_tagged_words_from_file(fileid):
 def get_sentences_from_file(fileid):
     return current_corpus.sents(fileids=fileid)
 
+def getTypes(category):
+    for (k,v) in informative.items():
+        if (category in v):
+            _type = str("informative")
+            sub_type = str(k)
+            break
+    for (k,v) in imaginative.items():
+        if (category in v):
+            _type = str("imaginative")
+            sub_type = str(k)
+            break
+
+    return (_type, sub_type)
 
 
 #-----------------------------------------------------------------------------
@@ -268,12 +293,11 @@ print t.get_tag_counts(get_tagged_words_from_file('cg22'))
 # make the csv file
 final_dump = []
 
-final_dump_header = ["FileID", "Category", "Exclamation Count", "Quote Count", "Dollar Sign Count", "Percent Sign Count", "Ampersand Count", "Apostrophe Count", "Open Parenthesis Count", "Close Parenthesis Count", "Star Symbol Count", "Comma Count", "Period Count", "Colon Count", "Semicolon Count", "Question Mark Count","'Therefore' Count","Long Characters", "Total Chars", "Second Person Pronouns","Vocabulary Count", "Lexical Diversity", "Sentence Count", "Char Avg Per Sentence", "FPPN Count", "'Me' count", "PP count","'I' count", "'it' count", "Noun count", "Verb count", "'that' count", "'which' count"]
+final_dump_header = ["FileID", "Category", "Type", "SubType", "Exclamation Count", "Quote Count", "Dollar Sign Count", "Percent Sign Count", "Ampersand Count", "Apostrophe Count", "Open Parenthesis Count", "Close Parenthesis Count", "Star Symbol Count", "Comma Count", "Period Count", "Colon Count", "Semicolon Count", "Question Mark Count","'Therefore' Count","Long Characters", "Total Chars", "Second Person Pronouns","Vocabulary Count", "Lexical Diversity", "Sentence Count", "Char Avg Per Sentence", "FPPN Count", "'Me' count", "PP count","'I' count", "'it' count", "Noun count", "Verb count", "'that' count", "'which' count"]
 tag = Tags()
 for t in tag.get_tags():
     final_dump_header.append(t)
 final_dump.append(final_dump_header)
-
 
 count = 1
 for fileid in current_corpus.fileids():
@@ -283,7 +307,14 @@ for fileid in current_corpus.fileids():
     
     row = []
     row.append(str(fileid))
-    row.append(str(current_corpus.categories(fileids=fileid)[0]))
+
+    # Parse categories and types.
+    category = str(current_corpus.categories(fileids=fileid)[0])
+    (_type, sub_type) = getTypes(category)
+
+    row.append(category)
+    row.append(_type)
+    row.append(sub_type)
     row.append(str(get_punctuation_count(words, "!")))
     row.append(str(get_punctuation_count(words, "\"")))
     row.append(str(get_punctuation_count(words, "$")))
