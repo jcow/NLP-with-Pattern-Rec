@@ -44,7 +44,7 @@ removeConstants = function(X)
 
 explore = function(X,classes,w=F)
 {
-  heatmap(X,Colv=NA)
+  doHeatMap(X, w)
   
   for (c in classes)
   {
@@ -60,11 +60,18 @@ explore = function(X,classes,w=F)
       c_colors[indexes[[i]]] = colors[i]
     }
     
-    plotPCA(X,c,c_colors)
-    plotMDS(X,c,c_colors)
+    plotPCA(X,c,c_colors,w)
+    plotMDS(X,c,c_colors,w)
     
     classify(X,c,.75)
   }  
+}
+
+doHeatMap = function(X, w=F){
+  
+  # Sets the heatmap window to be 4" by 4"
+  if (w) windows(4,4)
+  heatmap(X,Colv=NA)
 }
 
 plotData = function(x,y,classes,colors,xlabel,ylabel,lpos="bottomleft",w=F)
@@ -99,6 +106,7 @@ plotBar = function(data,names,w=F)
 
 plotPCA = function(X,classes,colors,w=F)
 {
+  
   # Perform PCA on the data and store the results.
   pca = prcomp(X,tol=0)
   
@@ -106,7 +114,7 @@ plotPCA = function(X,classes,colors,w=F)
   x = pca$x[,1]
   y = pca$x[,2]
   
-  plotData(x,y,classes,colors,"First Principal Component","Second Principal Component")
+  plotData(x,y,classes,colors,"First Principal Component","Second Principal Component", w=w)
   
   # Retrieve the standard deviation of each component.
   std = as.vector(pca$sdev)
