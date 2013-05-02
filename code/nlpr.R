@@ -41,11 +41,11 @@ classes[[3]] = categories
 
 # explore all non-constant features
 cat("\nAll Non-Constant Features\n")
-explore(non_constant_features,classes, T)
+explore(non_constant_features,classes,F,F)
 
 # explore all feature-selected features
 cat("\nFeature-selected Features\n")
-explore(s_features,classes, T)
+explore(s_features,classes,F,F)
 
 # stop("Bam!")
 
