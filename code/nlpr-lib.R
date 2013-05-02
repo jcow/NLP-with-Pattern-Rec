@@ -44,7 +44,7 @@ removeConstants = function(X)
 
 explore = function(X,classes,w=F)
 {
-  doHeatMap(X, w)
+#   doHeatMap(X, w)
   
   for (c in classes)
   {
@@ -62,8 +62,10 @@ explore = function(X,classes,w=F)
     
     plotPCA(X,c,c_colors,w)
     plotMDS(X,c,c_colors,w)
+    plotLDA(X,c,c_colors,w)
     
-    classify(X,c,.75)
+    # find the accuracy of LDA
+    classify(X,c)
   }  
 }
 
@@ -162,33 +164,112 @@ plotMDS = function(X,classes,colors,w=F)
   #legend("bottomleft", unique(classes), col=unique(colors), pch=19)
 }
 
-classify = function(X, classes, tProp)
+plotLDA = function(X, classes,colors,w=F){
+  
+  # Sets the plot window to be 4" by 4"
+  if (w) windows(4,4)
+  
+  # Adjusts the margins of the plot.
+  par(mar=c(2.5,2.5,2.5,2.5),mgp=c(1.5,.5,0))
+  
+  # do a scatter plot if enough classes to get two linear discriminents
+  if(length(unique(classes)) > 2){
+  
+    z = lda(X,classes)
+    #get the projections
+    projection_onto_first = as.matrix(X) %*% z$scaling[,1]
+    projection_onto_second = as.matrix(X) %*% z$scaling[,2]
+    
+    # plot it
+    plot(projection_onto_first, projection_onto_second, pch = 19, 
+         col = colors,
+         xlab = "Linear Discriminant 1",
+         ylab = "Linear Discriminant 2")
+  }
+  # only 2 classes, one linear discriminent, do a density plot
+  else{
+    
+    new_colors = unique(colors)
+    first_color = new_colors[1]
+    second_color = new_colors[2]
+    
+    # train the data
+    z = lda(X, classes)
+    
+    #seperate the data
+    nl_info = X[which(classes == "informative"),]
+    nl_imag = X[which(classes == "imaginative"),]
+    
+    # project it
+    projection_onto_first = as.matrix(X) %*% z$scaling[,1]
+    nl_info_projection_onto_first = as.matrix(nl_info) %*% z$scaling[,1]
+    nl_imag_projection_onto_first = as.matrix(nl_imag) %*% z$scaling[,1]
+    
+    myDens = density(projection_onto_first)
+    myXrange = range(myDens$x)
+    
+    myDensInfo = density(nl_info_projection_onto_first)
+    myDensImag = density(nl_imag_projection_onto_first)
+
+    plot(myDensInfo$x, myDensInfo$y, type = "l", col = first_color,
+         xlim = myXrange, xlab = "Linear Discriminant 1",ylab = "Density")
+    lines(myDensImag$x, myDensImag$y, col=second_color)
+    
+  }
+  
+  
+}
+
+classify = function(X, classes)
 {
-    # Generate a vector to store some proportion of unique training indexes
-    print("Generating sample indexes from the dataset...")
-    train = sample(1:nrow(X), (nrow(X)*tProp))
+  
+  # k-fold validation amount, how large do you want your chunks to be?
+  fold_amount = 1
+  
+  # simple declaratives to setup
+  subset_min = 1
+  subset_max = fold_amount
+  accuracy_totals = c()
+  
+  
+  if(fold_amount == 1){
+    print("Doing Leave-one-out cross validation")
+  }
+  else{
+    print(paste(paste("Doing", fold_amount), "fold cross validation"))
+  }
+  
+  # loop though and do fold_amount-fold cross validation
+  while(subset_min < nrow(X)){
+   
+    # get the training indices
+    leave_out = seq(subset_min, subset_max)
+    train = seq(1:nrow(X))
+    train = train[! train %in% leave_out]
+    
     
     # Perform LDA on the training samples of the dataset.
-    print("Performing LDA on the training samples...!")
-    #if (is.na(tol))
     z = lda(X[train,],classes[train])
-    #else
-    #  z = lda(X[train,],classes[train], tol=tol)
     
-    print("Generating results...")
     # Generate the predicted classes for the set of non-trained, or "test," indexes.
     results = predict(z, X[-train,])$class
     
     # Infer a vector of incorrectly classified test samples.
     missed = which(results != classes[-train])
     
-    # Calculate the accuracy of the classifier.
-    accuracy = 100 * (length(train) - length(missed)) / length(train)
+    # Calculate the accuracy of the classifier. = 1 - (number missed / number trained on)
+    accuracy =( 1- (length(missed) / (nrow(X) - length(train)))) * 100
     
-    # Print the accuracy of the classification.
-    print(paste("Accuracy of LDA on the dataset: ", accuracy, "%", sep=""))
+    accuracy_totals = c(accuracy_totals, accuracy)
     
-    return(z)
+    subset_min = subset_min + fold_amount
+    subset_max = subset_max + fold_amount
+    
+#     Lda throws an error on 10 fold, is the counter ok?
+  }
+  
+  print(paste("Result: ", sum(accuracy_totals)/(length(accuracy_totals)), "%", sep=""))
+  
 }
 
 normalize = function(X)

@@ -28,26 +28,24 @@ types = nl_samples$Type
 sub_types = nl_samples$SubType
 categories = nl_samples$Category
 
+# set the data to be used
 features = nl_samples[,5:ncol(nl_samples)]
-print(ncol(features))
-features = as.matrix(normalize(removeConstants(features)))
-print(ncol(features))
+non_constant_features = normalize(as.matrix(removeConstants(features)))
+s_features = normalize(as.matrix(nl_samples[, c("Question.Mark.Count", "Long.Characters", "Total.Chars", "Second.Person.Pronouns", "Vocabulary.Count", "Lexical.Diversity", "Char.Avg.Per.Sentence", "Noun.count", "BEZ", "CD", "HVZ", "NP", "NPS", "NR", "PP.", "PPO", "PPS", "PPS.BEZ", "RB", "UH", "VBD", "VBG", "WQL")]))
 
+# set the classes to be classified
 classes = list()
 classes[[1]] = types
 classes[[2]] = sub_types
 classes[[3]] = categories
 
+# explore all non-constant features
 cat("\nAll Non-Constant Features\n")
-explore(features,classes)
+explore(non_constant_features,classes, T)
 
-#s_features = normalize(nl_samples[,selectFeatures(nl_samples)])
-s_features = normalize(as.matrix(nl_samples[, c("Question.Mark.Count", "Long.Characters", "Total.Chars", "Second.Person.Pronouns", "Vocabulary.Count", "Lexical.Diversity", "Char.Avg.Per.Sentence", "Noun.count", "BEZ", "CD", "HVZ", "NP", "NPS", "NR", "PP.", "PPO", "PPS", "PPS.BEZ", "RB", "UH", "VBD", "VBG", "WQL")]))
+# explore all feature-selected features
+cat("\nFeature-selected Features\n")
+explore(s_features,classes, T)
 
-cat("\nSubset of Features\n")
-explore(s_features,classes)
-
-#classify(nl_features, c("Imaginative", "Non-Imaginative"), 0.75)
-
-stop("Bam!")
+# stop("Bam!")
 
