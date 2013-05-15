@@ -39,13 +39,17 @@ classes[[1]] = types
 classes[[2]] = sub_types
 classes[[3]] = categories
 
+# explore all features
+cat("\nAll Features\n")
+explore(features,classes,F,T)
+
 # explore all non-constant features
 cat("\nAll Non-Constant Features\n")
-explore(non_constant_features,classes,F,F)
+explore(non_constant_features,classes,F,T)
 
 # explore all feature-selected features
 cat("\nFeature-selected Features\n")
-explore(s_features,classes,F,F)
+explore(s_features,classes,F,T)
 
 # stop("Bam!")
 

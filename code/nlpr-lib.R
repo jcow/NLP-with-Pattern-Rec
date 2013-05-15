@@ -42,7 +42,7 @@ removeConstants = function(X)
   return(features[,-badIndexes])
 }
 
-explore = function(X,classes,individual=F,w=F)
+explore = function(X,classes,individual=F,w=T)
 {
 #   doHeatMap(X, w)
   if (individual)
@@ -103,10 +103,14 @@ explore = function(X,classes,individual=F,w=F)
     
     plotPCA(X,classes,c_colors,w)
     plotMDS(X,classes,c_colors,w)
-    plotLDA(X,classes,c_colors,w)
     
-    # find the accuracy of LDA
-    classify(X,classes)
+    if (ncol(X) != 250)
+    {
+      plotLDA(X,classes,c_colors,w)
+      
+      # find the accuracy of LDA
+      classify(X,classes)
+    }    
   }
 }
 
@@ -118,10 +122,7 @@ doHeatMap = function(X, w=F){
 }
 
 plotData = function(x,y,classes,colors,xlabel,ylabel,lpos="bottomleft",w=F)
-{
-  # Sets the plot window to be 4" by 4"
-  if (w) windows(4,4)
-  
+{  
   # Plot the results of the PCA with red-bordered, red-filled circles.
   plot(x,y,
        pch=19,
@@ -144,7 +145,7 @@ plotBar = function(data,names,w=F)
   barplot(data,names.arg=names)
 }
 
-plotPCA = function(X,classes,colors,w=F)
+plotPCA = function(X,classes,colors,w=T)
 {
   # Perform PCA on the data and store the results.
   pca = prcomp(X,tol=0)
@@ -186,6 +187,9 @@ plotPCA = function(X,classes,colors,w=F)
   }
   else
   {
+    # Sets the plot window to be 4" by 4"
+    if (w) windows(12,4)
+    
     layout(matrix(c(1,2,3),nrow=1))
     
     for (i in 1:length(classes))
@@ -219,7 +223,7 @@ plotPCA = function(X,classes,colors,w=F)
   }
 }
 
-plotMDS = function(X,classes,colors,w=F)
+plotMDS = function(X,classes,colors,w=T)
 {
   # Generate two eigen-vectors from the distance matrix of the Iris data.
   points = cmdscale(dist(X))
@@ -243,6 +247,9 @@ plotMDS = function(X,classes,colors,w=F)
   }
   else
   {
+    # Sets the plot window to be 4" by 4"
+    if (w) windows(12,4)
+    
     layout(matrix(c(1,2,3),nrow=1))
     
     for (i in 1:length(classes))
@@ -259,7 +266,7 @@ plotMDS = function(X,classes,colors,w=F)
   }
 }
 
-plotLDA = function(X, classes,colors,w=F)
+plotLDA = function(X, classes,colors,w=T)
 {
   if (!is.list(classes))
   {
@@ -315,13 +322,13 @@ plotLDA = function(X, classes,colors,w=F)
   }
   else
   {
+    # Sets the plot window to be 4" by 4"
+    if (w) windows(12,4)
+    
     layout(matrix(c(1,2,3),nrow=1))
     
     for (i in 1:length(classes))
-    {
-      # Sets the plot window to be 4" by 4"
-      if (w) windows(4,4)
-      
+    {      
       # do a scatter plot if enough classes to get two linear discriminents
       if(length(unique(classes[[i]])) > 2){
         
