@@ -416,7 +416,6 @@ classify = function(X, classes)
       subset_min = subset_min + fold_amount
       subset_max = subset_max + fold_amount
       
-      #     Lda throws an error on 10 fold, is the counter ok?
     }
     
     print(paste("Result: ", sum(accuracy_totals)/(length(accuracy_totals)), "%", sep=""))
@@ -466,8 +465,6 @@ classify = function(X, classes)
         
         subset_min = subset_min + fold_amount
         subset_max = subset_max + fold_amount
-        
-        #     Lda throws an error on 10 fold, is the counter ok?
       }
       
       print(paste("Result: ", sum(accuracy_totals)/(length(accuracy_totals)), "%", sep=""))

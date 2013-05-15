@@ -1,3 +1,13 @@
+##########################################################################################################
+# Evin Ozer
+# Jason Cowan
+# CSCI 548-01
+# Spring Semester
+# 4/16/13
+#
+# Graduate Project - Natural Language Pattern Recognition
+# Uses the NLTK to obtain 250 dimensions of parts-of-speech tags to be used for pattern recognition
+##########################################################################################################
 from __future__ import division
 import nltk
 from nltk.corpus import brown
@@ -44,6 +54,9 @@ def get_tagged_words_from_file(fileid):
 def get_sentences_from_file(fileid):
     return current_corpus.sents(fileids=fileid)
 
+##
+# returns the types
+##
 def getTypes(category):
     for (k,v) in informative.items():
         if (category in v):
@@ -258,9 +271,9 @@ def get_punctuation_count(words, punc):
     return count
     
 
-
-# TEST CRAP
-
+##
+# Print testing
+##
 '''
 words = get_words_from_file('cg22')
 tagged_words = get_tagged_words_from_file('cg22')
@@ -290,21 +303,32 @@ print t.get_tag_counts(get_tagged_words_from_file('cg22'))
 '''
 
 
-# make the csv file
+##
+# Writes the data out to a csv
+##
+
+# final dump's list
 final_dump = []
 
+# header list without the nltk tag categories
 final_dump_header = ["FileID", "Category", "Type", "SubType", "Exclamation Count", "Quote Count", "Dollar Sign Count", "Percent Sign Count", "Ampersand Count", "Apostrophe Count", "Open Parenthesis Count", "Close Parenthesis Count", "Star Symbol Count", "Comma Count", "Period Count", "Colon Count", "Semicolon Count", "Question Mark Count","'Therefore' Count","Long Characters", "Total Chars", "Second Person Pronouns","Vocabulary Count", "Lexical Diversity", "Sentence Count", "Char Avg Per Sentence", "FPPN Count", "'Me' count", "PP count","'I' count", "'it' count", "Noun count", "Verb count", "'that' count", "'which' count"]
 tag = Tags()
+
+# add the nltk categories to the list
 for t in tag.get_tags():
     final_dump_header.append(t)
 final_dump.append(final_dump_header)
 
+# loop though the corpus and get the data
 count = 1
 for fileid in current_corpus.fileids():
+
+	# get the necessities
     words = get_words_from_file(fileid)
     tagged_words = get_tagged_words_from_file(fileid)
     sents = get_sentences_from_file(fileid)
     
+	# declare a row to append to
     row = []
     row.append(str(fileid))
 
@@ -312,6 +336,7 @@ for fileid in current_corpus.fileids():
     category = str(current_corpus.categories(fileids=fileid)[0])
     (_type, sub_type) = getTypes(category)
 
+	# append all the functions that we have written
     row.append(category)
     row.append(_type)
     row.append(sub_type)
@@ -347,18 +372,21 @@ for fileid in current_corpus.fileids():
     row.append(str(get_that_count(words)))
     row.append(str(get_which_count(words)) )
 
+	# loop though and get the information for the tags provided by the nltk
     tag = Tags()
     for t in tag.get_tag_counts(tagged_words):
         row.append(t[1])
     
     print str(count)+" row length: "+str(len(row))
     
+	# append to the final dump
     final_dump.append(row)
     
     count += 1
     
 final_string = ""
 
+# run though the final data and put it into CSV form
 last_line = len(final_dump[0])-1
 counter = 0
 for row in final_dump:
@@ -366,11 +394,7 @@ for row in final_dump:
     if counter != last_line:
         final_string = str(final_string + "\n")
 
-print "-----------------"
-#print final_string
-print len(final_dump[0])
-print len(final_dump[1])
-
+# dump the data to the file
 f = open("../results/tagged_words.csv", "r+")
 f.writelines(final_string)
 f.close()

@@ -1,2 +1,0 @@
-I am a test file for sanity checking.
-Is the test file crazy or does it have its sanity?
